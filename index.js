@@ -1,21 +1,23 @@
-const http = require("http");
+const express = require("express");
 const port = 7777;
 
+const app = express();
 
-const server = http.createServer((req, res) => {
-  res.writeHead(200, { "content-type": "text/plain" });
-
-  if (req.url === "/") {
-    res.end("Hello World from nodejs server");
-  } else if (req.url === "/test") {
-    res.end("Hello World from test endpoint");
-  } else if (req.url === "/hello") {
-    res.end("Hello World from hello endpoint");
-  } else if(req.url === "/order") {
-    res.end("Hello World from order endpoint");
-  }
+app.use("/test", (req, res) => {
+  res.json("Hello From test EndPoint");
 });
 
-server.listen(port, () => {
+app.use("/hello", (req, res) => {
+  res.json("Hello From hello EndPoint");
+});
+
+app.use("/getDetails", (req, res) => {
+  res.json({
+    name: "vyenkatesh",
+    city: "pune",
+  });
+});
+
+app.listen(port, () => {
   console.log("Server is listening on ", port);
 });
