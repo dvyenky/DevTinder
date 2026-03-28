@@ -1,4 +1,6 @@
 const express = require("express");
+const bcrypt = require("bcrypt");
+const user = require("../Models/user");
 const { User_Auth } = require("../Middlewares/UserAuth");
 const { Validate_Data } = require("../Utils/ValidateData");
 
@@ -29,6 +31,35 @@ profileAuth.patch("/profile/edit", User_Auth, async (req, res) => {
       .send(`${loggedin_user.firstName} Your Profile Update Successfully`);
   } catch {
     res.status(400).send("Something wents wrong : ", err.message);
+  }
+});
+
+profileAuth.patch("/profile/password", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      throw new Error("Please Provide Credential");
+    }
+    const user_data = await user.findOne({ email: email });
+    if (!user_data) {
+      throw new Error("User Not Found");
+    }
+
+    const password_hash = await bcrypt.hash(password, 10);
+    const updated_data = await user.findOneAndUpdate(
+      {
+        email,
+      },
+      { password: password_hash },
+      { returnDocument: true },
+    );
+    res
+      .status(200)
+      .json({ message: "Password Updated Successfully ", data: updated_data });
+  } catch (err) {
+    res
+      .status(400)
+      .json({ message: "Something wents Wrong : ", error: err.message });
   }
 });
 
